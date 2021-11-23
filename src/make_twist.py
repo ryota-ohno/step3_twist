@@ -179,16 +179,16 @@ def make_xyzfile1(monomer_name,params_dict):##パターン1 parallel:+A3 t-shape
     monomer_array_c1 = get_monomer_xyzR(monomer_name,0,0,0,0,0,A3, phi1)##centerのc
     monomer_array_i01 = get_monomer_xyzR(monomer_name,c[0],c[1],c[2],0,0,A3, phi1)
     if a_ > b_:
-        monomer_array_ip1 = get_monomer_xyzR(monomer_name,c[0],c[1]+b_,c[2]+R4,0,0,A3, phi1)
-        monomer_array_ip2 = get_monomer_xyzR(monomer_name,c[0],c[1]-b_,c[2]-R4,0,0,A3, phi1)
+        monomer_array_ip1 = get_monomer_xyzR(monomer_name,c[0],c[1]+b_,c[2],0,0,A3, phi1)
+        monomer_array_ip2 = get_monomer_xyzR(monomer_name,c[0],c[1]-b_,c[2],0,0,A3, phi1)
     else:##a_<b_
-        monomer_array_ip1 = get_monomer_xyzR(monomer_name,c[0]+a_,c[1],c[2]+2*R3-R4,0,0,A3, phi1)
-        monomer_array_ip2 = get_monomer_xyzR(monomer_name,c[0]-a_,c[1],c[2]-(2*R3-R4),0,0,A3, phi1)
+        monomer_array_ip1 = get_monomer_xyzR(monomer_name,c[0]+a_,c[1],c[2],0,0,A3, phi1)
+        monomer_array_ip2 = get_monomer_xyzR(monomer_name,c[0]-a_,c[1],c[2],0,0,A3, phi1)
     
-    monomer_array_it1 = get_monomer_xyzR(monomer_name,c[0]+a_/2,c[1]+b_/2,c[2]+R3,0,0,-A3, phi2)
-    monomer_array_it2 = get_monomer_xyzR(monomer_name,c[0]+a_/2,c[1]-b_/2,c[2]+R3-R4,0,0,-A3, phi2)
-    monomer_array_it3 = get_monomer_xyzR(monomer_name,c[0]-a_/2,c[1]-b_/2,c[2]-R3,0,0,-A3, phi2)
-    monomer_array_it4 = get_monomer_xyzR(monomer_name,c[0]-a_/2,c[1]+b_/2,c[2]-R3+R4,0,0,-A3, phi2)
+    monomer_array_it1 = get_monomer_xyzR(monomer_name,c[0]+a_/2,c[1]+b_/2,c[2],0,0,-A3, phi2)
+    monomer_array_it2 = get_monomer_xyzR(monomer_name,c[0]+a_/2,c[1]-b_/2,c[2],0,0,-A3, phi2)
+    monomer_array_it3 = get_monomer_xyzR(monomer_name,c[0]-a_/2,c[1]-b_/2,c[2],0,0,-A3, phi2)
+    monomer_array_it4 = get_monomer_xyzR(monomer_name,c[0]-a_/2,c[1]+b_/2,c[2],0,0,-A3, phi2)
     
     xyz_list1=['240 \n','tetracene8 \n']##4分子のxyzファイルを作成
     monomers_array_8 = np.concatenate([monomer_array_c1,monomer_array_i01,monomer_array_ip1,monomer_array_ip2,monomer_array_it1,monomer_array_it2,monomer_array_it3,monomer_array_it4],axis=0)
