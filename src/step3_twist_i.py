@@ -77,7 +77,7 @@ def listen(args):
 
     auto_csv = os.path.join(auto_dir,'step3_twist.csv')
     df_E = pd.read_csv(auto_csv)
-    df_queue = df_E.loc[df_E['status']=='InProgress',['machine_type','file_name','A1','A2','a','b','theta','cx','cy','cz']]
+    df_queue = df_E.loc[df_E['status']=='InProgress',['machine_type','file_name']]
     machine_type_list = df_queue['machine_type'].values.tolist()
     len_queue = len(df_queue)
     maxnum_machine2 = 3#int(num_nodes/2)
