@@ -40,7 +40,7 @@ def init_process(args):
     
     auto_csv_path = os.path.join(auto_dir,'step3_twist.csv')
     if not os.path.exists(auto_csv_path):        
-        df_E = pd.DataFrame(columns = ['a','b','theta','A1','A2','cx','cy','cz','E','E_p','E_t','E_i0','E_ip1','E_ip2','E_it1','E_it2','E_it3','E_it4','machine_type','status','file_name'])
+        df_E = pd.DataFrame(columns = ['a','b','theta','A1','A2','cx','cy','cz','E','E_p','E_t','E_i0','E_ip1','E_ip2','E_ip3','E_it1','E_it2','E_it3','E_it4','machine_type','status','file_name'])
     else:
         df_E = pd.read_csv(auto_csv_path)
         df_E = df_E[df_E['status']!='InProgress']
@@ -51,6 +51,15 @@ def init_process(args):
     df_init.to_csv(os.path.join(auto_dir,'step3_twist_init_params.csv'),index=False)
 
 def main_process(args):
+    auto_dir = args.auto_dir
+    os.makedirs(auto_dir, exist_ok=True)
+    os.makedirs(os.path.join(auto_dir,'gaussian'), exist_ok=True)
+    os.makedirs(os.path.join(auto_dir,'gaussview'), exist_ok=True)
+    auto_csv_path = os.path.join(auto_dir,'step3_twist.csv')
+    if not os.path.exists(auto_csv_path):        
+        df_E = pd.DataFrame(columns = ['a','b','theta','A1','A2','cx','cy','cz','E','E_i0','E_ip1','E_ip2','E_ip3','E_it1','E_it2','E_it3','E_it4','machine_type','status','file_name'])##いじる
+        df_E.to_csv(auto_csv_path,index=False)##step3を二段階でやる場合二段階目ではinitをやらないので念のためmainにも組み込んでおく
+
     os.chdir(os.path.join(args.auto_dir,'gaussian'))
     isOver = False
     while not(isOver):
@@ -63,10 +72,10 @@ def listen(args):
     monomer_name = args.monomer_name
     num_nodes = args.num_nodes
     isTest = args.isTest
-    fixed_param_keys = ['A1','A2']
-    opt_param_keys = ['a','b','theta','cx','cy','cz']
+    fixed_param_keys = ['A1','A2','cx','cy','cz']
+    opt_param_keys = ['a','b','theta']
 
-    auto_step2_csv = '/home/koyama/Working/step3_twist/{}/step2_twist/step2_twist.csv'.format(monomer_name)##これは何？
+    auto_step2_csv = '/home/ohno/Working/step3_twist/{}/step2_twist/step2_twist.csv'.format(monomer_name)##これは何？
     df_step2 = pd.read_csv(auto_step2_csv)
     
     auto_csv = os.path.join(auto_dir,'step3_twist.csv')
@@ -82,11 +91,11 @@ def listen(args):
         if not(os.path.exists(log_filepath)):#logファイルが生成される直前だとまずいので
             continue
         E_list=get_E(log_filepath)
-        if len(E_list)!=5:
+        if len(E_list)!=6:
             continue
         else:
             len_queue-=1;machine_type_list.remove(machine_type)
-            Ei0,Eip1,Eip2,Eit1,Eit2=map(float,E_list)
+            Ei0,Eip1,Eip2,Eip3,Eit1,Eit2=map(float,E_list)
             Eit3 = Eit2; Eit4 = Eit1
             try:
                 Ep, Et = df_step2[(df_step2['A1']==A1)&(df_step2['A2']==A2)&(df_step2['theta']==theta)&(df_step2['a']==a)&(df_step2['b']==b)][['E_p','E_t']].values[0]
@@ -104,8 +113,8 @@ def listen(args):
                 df_step2=df_step2.append(df_newline,ignore_index=True)
                 df_step2.to_csv(auto_step2_csv,index=False)
             
-            E = 4*Et + 2*Ep + 2*(Ei0 + Eip1+ Eip2 + Eit1 + Eit2 + Eit3 + Eit4)
-            df_E.loc[idx, ['E_p','E_t','E_i0','E_ip1','E_ip2','E_it1','E_it2','E_it3','E_it4','E','status']] = [Ep,Et,Ei0,Eip1,Eip2,Eit1,Eit2,Eit3,Eit4,E,'Done']
+            E = 4*Et + 2*Ep + 2*(Ei0 + Eip1 + Eip2 + Eip3 + Eit1 + Eit2 + Eit3 + Eit4)
+            df_E.loc[idx, ['E_p','E_t','E_i0','E_ip1','E_ip2','E_ip3','E_it1','E_it2','E_it3','E_it4','E','status']] = [Ep,Et,Ei0,Eip1,Eip2,Eip3,Eit1,Eit2,Eit3,Eit4,E,'Done']
             df_E.to_csv(auto_csv,index=False)
             break#2つ同時に計算終わったりしたらまずいので一個で切る
     isAvailable = len_queue < num_nodes 
@@ -117,18 +126,18 @@ def listen(args):
             alreadyCalculated = check_calc_status(auto_dir,params_dict)
             if not(alreadyCalculated):
                 file_name = exec_gjf(auto_dir, monomer_name, {**params_dict}, machine_type,isInterlayer=True,isTest=isTest)
-                df_newline = pd.Series({**params_dict,'E':0.,'E_p':0.,'E_t':0.,'E_i0':0.,'E_ip1':0.,'E_ip2':0.,'E_it1':0.,'E_it2':0.,'E_it3':0.,'E_it4':0.,'machine_type':machine_type,'status':'InProgress','file_name':file_name})
+                df_newline = pd.Series({**params_dict,'E':0.,'E_p':0.,'E_t':0.,'E_i0':0.,'E_ip1':0.,'E_ip2':0.,'E_ip3':0.,'E_it1':0.,'E_it2':0.,'E_it3':0.,'E_it4':0.,'machine_type':machine_type,'status':'InProgress','file_name':file_name})
                 df_E=df_E.append(df_newline,ignore_index=True)
                 df_E.to_csv(auto_csv,index=False)
     
-    init_params_csv=os.path.join(auto_dir, 'step3-twist_init_params.csv')
+    init_params_csv=os.path.join(auto_dir, 'step3_twist_init_params.csv')
     df_init_params = pd.read_csv(init_params_csv)
     df_init_params_done = filter_df(df_init_params,{'status':'Done'})
     isOver = True if len(df_init_params_done)==len(df_init_params) else False
     return isOver
 
 def check_calc_status(auto_dir,params_dict):
-    df_E= pd.read_csv(os.path.join(auto_dir,'step3-twist.csv'))
+    df_E= pd.read_csv(os.path.join(auto_dir,'step3_twist.csv'))
     if len(df_E)==0:
         return False
     df_E_filtered = filter_df(df_E, params_dict)
@@ -203,15 +212,11 @@ def get_opt_params_dict(df_cur, init_params_dict,fixed_params_dict, monomer_name
                         (df_val['status']=='Done')
                                       ]
                     if len(df_val_ab)==0:
-                        cx, cy, cz = get_c_vec_vdw(monomer_name,A1,A2,a,b,theta)
-                        cx, cy, cz = np.round(cx,1), np.round(cy,1), np.round(cz,1)
-                        return False,{'a':a,'b':b,'theta':theta, "cx":cx, "cy":cy, "cz":cz }
+                        return False,{'a':a,'b':b,'theta':theta}
                     heri_list.append([a,b,theta]);E_list.append(df_val_ab['E'].values[0])
         a_init,b_init,theta_init = heri_list[np.argmin(np.array(E_list))]
         if a_init==a_init_prev and b_init==b_init_prev and theta_init==theta_init_prev:
-            cx, cy, cz = get_c_vec_vdw(monomer_name,A1,A2,a_init,b_init,theta_init)
-            cx, cy, cz = np.round(cx,1), np.round(cy,1), np.round(cz,1)
-            return True,{'a':a_init,'b':b_init, 'theta':theta_init, "cx":cx, "cy":cy, "cz":cz }
+            return True,{'a':a_init,'b':b_init, 'theta':theta_init }
         else:
             a_init_prev=a_init;b_init_prev=b_init;theta_init_prev=theta_init
         
