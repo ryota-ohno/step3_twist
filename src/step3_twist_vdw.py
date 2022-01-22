@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from utils import Rod
-from make_twist import get_monomer_xyzR
+from make_i_2 import get_monomer_xyzR
 from scipy import signal
 from scipy.ndimage.filters import maximum_filter
 

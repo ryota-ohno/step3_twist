@@ -4,9 +4,9 @@ import time
 import sys
 from tqdm import tqdm
 sys.path.append(os.path.join(os.environ['HOME'],'Working/interaction/'))
-from make_i import exec_gjf
+from make_i_2 import exec_gjf
 from step3_twist_vdw import get_c_vec_vdw
-from utils import get_E
+from utils import get_E1
 import argparse
 import numpy as np
 from scipy import signal
@@ -87,7 +87,7 @@ def listen(args):
         log_filepath = os.path.join(*[auto_dir,'gaussian',file_name])
         if not(os.path.exists(log_filepath)):#logファイルが生成される直前だとまずいので
             continue
-        E_list=get_E(log_filepath)
+        E_list=get_E1(log_filepath)
         if len(E_list)!=5:
             continue
         else:
