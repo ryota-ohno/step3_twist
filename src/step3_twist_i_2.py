@@ -22,9 +22,9 @@ def init_process(args):
 
     def get_init_para_csv(auto_dir,monomer_name):
         init_params_csv = os.path.join(auto_dir, 'step3_twist_init_params.csv')
-        df = pd.read_csv('/home/koyama/Working/step3_twist/{}/step2_twist/step2_twist_min.csv'.format(monomer_name))
+        df = pd.read_csv('/home/ohno/Working/step3_twist/{}/step2_twist/step2_twist_min.csv'.format(monomer_name))
 #         df = df[(df["A2"]==30)&(df["A1"]<=0)&(df["A1"]>=-10)&(df["theta"]>45)]
-        df = df[(df["A2"]==32)&(df["A1"]<=0)&(df["A1"]>=-20)&(df["theta"]>45)]
+        #df = df[(df["A2"]==32)&(df["A1"]<=0)&(df["A1"]>=-20)&(df["theta"]>45)]
         
         inner_zip = df[['a','b','theta','A1','A2']].values
         print(inner_zip)
