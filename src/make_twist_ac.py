@@ -157,7 +157,7 @@ def get_xyzR_lines(xyzR_array,machine_type,file_description):
     return lines
 
 # 実行ファイル作成
-def get_one_exe(file_name,machine_type=2):
+def get_one_exe(file_name,machine_type):
     file_basename = os.path.splitext(file_name)[0]
     #mkdir
     if machine_type==1:
@@ -363,7 +363,7 @@ def exec_gjf(auto_dir, monomer_name, params_dict, machine_type,isInterlayer,isTe
     print(params_dict)
     
     file_name = make_gjf_xyz(auto_dir, monomer_name, params_dict,machine_type, isInterlayer)
-    cc_list = get_one_exe(file_name,machine_type,machine_type)
+    cc_list = get_one_exe(file_name,machine_type)
     sh_filename = os.path.splitext(file_name)[0]+'.r1'
     sh_path = os.path.join(inp_dir,sh_filename)
     with open(sh_path,'w') as f:
