@@ -192,7 +192,8 @@ def filter_df(df, dict_filter):
     df['A1']=df['A1'].astype(float)##df.queryのバグ
     df['A2']=df['A2'].astype(float)##df.queryのバグ
     df['cy']=df['cy'].astype(float)##df.queryのバグ
-    df_filtered = df.query(' and '.join(query))
+    query0=' and '.join(query)
+    df_filtered = df.query(query0)
     return df_filtered
 
 if __name__ == '__main__':
