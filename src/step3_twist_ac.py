@@ -187,13 +187,15 @@ def filter_df(df, dict_filter):
     for k, v in dict_filter.items():
         if type(v)==str:
             query.append('{} == "{}"'.format(k,v))
+            df=df[df[k]==v]
         else:
             query.append('{} == {}'.format(k,v))
+            df=df[df[k]==v]
     df['A1']=df['A1'].astype(float)##df.queryのバグ
     df['A2']=df['A2'].astype(float)##df.queryのバグ
     df['cy']=df['cy'].astype(float)##df.queryのバグ
     query0=' and '.join(query)
-    df_filtered = df.query(query0)
+    df_filtered=df
     return df_filtered
 
 if __name__ == '__main__':
