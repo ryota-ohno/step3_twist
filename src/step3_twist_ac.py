@@ -18,7 +18,7 @@ sys.path.append(INTERACTION_PATH)
 
 from make_twist_ac import exec_gjf
 
-from utils import get_E
+from utils import get_E1
 
 
 def main_process(args):
@@ -60,7 +60,7 @@ def listen(args):
         log_filepath = os.path.join(*[auto_dir,'gaussian',file_name])
         if not(os.path.exists(log_filepath)):#logファイルが生成される直前だとまずいので
             continue
-        E_list=get_E(log_filepath)
+        E_list=get_E1(log_filepath)
         if len(E_list)!=10:##計算する層状の分子数
             continue
         else:##エネルギーの内訳全般
