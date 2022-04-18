@@ -9,7 +9,7 @@ MONOMER_LIST = ["BTBT","naphthalene","anthracene","tetracene","pentacene","hexac
 ############################汎用関数###########################
 def get_monomer_xyzR(monomer_name,Ta,Tb,Tc,A1,A2,A3,phi,isFF=False):
     T_vec = np.array([Ta,Tb,Tc])
-    df_mono=pd.read_csv('~/Working/step3_twist/{}/assets/monomer.csv'.format(monomer_name))
+    df_mono=pd.read_csv('~/Working/step3_twist/monomer/{}/monomer.csv'.format(monomer_name))
     atoms_array_xyzR=df_mono[['X','Y','Z','R']].values
     
     ex = np.array([1.,0.,0.]); ey = np.array([0.,1.,0.]); ez = np.array([0.,0.,1.])
@@ -66,12 +66,33 @@ def get_monomer_xyzR(monomer_name,Ta,Tb,Tc,A1,A2,A3,phi,isFF=False):
         else:
             return np.concatenate([xyz_array,R_array],axis=1)
 
+    elif monomer_name=='alkyl_chain':
+        #alkylの基準
+        C0_index = 0 #BTBT骨格の端
+        C1_index = 1 #アルキルの根本
+        
+        C0=xyz_array[C0_index]
+        C1=xyz_array[C1_index]
+        
+        #phi1に関するalkylの軸
+        n1=C1-C0
+        n1/=np.linalg.norm(n1)
+        
+        #alkyl回転・分子1作成
+        xyz_array[C1_index:] = np.matmul((xyz_array[C1_index:]-C0),Rod(n1,phi).T) + C0
+        
+        if isFF:
+            FFconfig_array=df_mono[['q','sig','eps']].values
+            return np.concatenate([xyz_array,R_array,FFconfig_array],axis=1)
+        else:
+            return np.concatenate([xyz_array,R_array],axis=1)
+
     else:
         raise RuntimeError('invalid monomer_name={}'.format(monomer_name))
 
 def get_monomer_xyzR_(monomer_name,Ta,Tb,Tc,A1,A2,A3,phi,isFF=False):##space inversionしたものを上層として使う際に使用
     T_vec = np.array([Ta,Tb,Tc])
-    df_mono=pd.read_csv('~/Working/step3_twist/{}/assets/monomer.csv'.format(monomer_name))
+    df_mono=pd.read_csv('~/Working/step3_twist/monomer/{}/monomer.csv'.format(monomer_name))
     atoms_array_xyzR=df_mono[['X','Y','Z','R']].values
     
     ex = np.array([1.,0.,0.]); ey = np.array([0.,1.,0.]); ez = np.array([0.,0.,1.])
@@ -99,7 +120,7 @@ def get_monomer_xyzR_(monomer_name,Ta,Tb,Tc,A1,A2,A3,phi,isFF=False):##space inv
         n1/=np.linalg.norm(n1)
         
         #alkyl回転・分子1作成
-        xyz_array[C1_index:] = np.matmul((xyz_array[C1_index:]-C0),Rod(n1,-phi).T) + C0
+        xyz_array[C1_index:] = np.matmul((xyz_array[C1_index:]-C0),Rod(n1,-phi).T) + C0##-phiに注意
         
         if isFF:
             FFconfig_array=df_mono[['q','sig','eps']].values
@@ -120,7 +141,28 @@ def get_monomer_xyzR_(monomer_name,Ta,Tb,Tc,A1,A2,A3,phi,isFF=False):##space inv
         n1/=np.linalg.norm(n1)
         
         #alkyl回転・分子1作成
-        xyz_array[C1_index:] = np.matmul((xyz_array[C1_index:]-C0),Rod(n1,-phi).T) + C0
+        xyz_array[C1_index:] = np.matmul((xyz_array[C1_index:]-C0),Rod(n1,-phi).T) + C0##-phiに注意
+        
+        if isFF:
+            FFconfig_array=df_mono[['q','sig','eps']].values
+            return np.concatenate([xyz_array,R_array,FFconfig_array],axis=1)
+        else:
+            return np.concatenate([xyz_array,R_array],axis=1)
+
+    elif monomer_name=='alkyl_chain':
+        #alkylの基準
+        C0_index = 0 #BTBT骨格の端
+        C1_index = 1 #アルキルの根本
+        
+        C0=xyz_array[C0_index]
+        C1=xyz_array[C1_index]
+        
+        #phi1に関するalkylの軸
+        n1=C1-C0
+        n1/=np.linalg.norm(n1)
+        
+        #alkyl回転・分子1作成
+        xyz_array[C1_index:] = np.matmul((xyz_array[C1_index:]-C0),Rod(n1,-phi).T) + C0##-phiに注意
         
         if isFF:
             FFconfig_array=df_mono[['q','sig','eps']].values
@@ -337,6 +379,8 @@ def make_gjf_xyz(auto_dir,monomer_name,params_dict,machine_type,isInterlayer):##
     elif monomer_name in MONOMER_LIST and isInterlayer:
         gij_xyz_lines = ['$ RunGauss\n'] + line_list_dimer_i01 + ['\n\n--Link1--\n'] + line_list_dimer_ip1+ ['\n\n--Link1--\n'] + line_list_dimer_ip2 + ['\n\n--Link1--\n'] + line_list_dimer_it1 + ['\n\n--Link1--\n'] + line_list_dimer_it2 + ['\n\n--Link1--\n'] + line_list_dimer_it3 + ['\n\n--Link1--\n'] + line_list_dimer_it4 + ['\n\n--Link1--\n'] + line_list_dimer_i02 + ['\n\n--Link1--\n'] + line_list_dimer_ip3+ ['\n\n--Link1--\n'] + line_list_dimer_ip4  + ['\n\n\n']##2層目9分子
     elif monomer_name=='mono-C9-BTBT':##tshaped ４分子を全て計算
+        gij_xyz_lines = ['$ RunGauss\n'] + line_list_dimer_i01 + ['\n\n--Link1--\n'] + line_list_dimer_ip1+ ['\n\n--Link1--\n'] + line_list_dimer_ip2 + ['\n\n--Link1--\n'] + line_list_dimer_it1 + ['\n\n--Link1--\n'] + line_list_dimer_it2 + ['\n\n--Link1--\n'] + line_list_dimer_it3 + ['\n\n--Link1--\n'] + line_list_dimer_it4 + ['\n\n--Link1--\n'] + line_list_dimer_i02 + ['\n\n--Link1--\n'] + line_list_dimer_ip3+ ['\n\n--Link1--\n'] + line_list_dimer_ip4  + ['\n\n\n']##2層目9分子
+    elif monomer_name=='alkyl_chain':##tshaped ４分子を全て計算
         gij_xyz_lines = ['$ RunGauss\n'] + line_list_dimer_i01 + ['\n\n--Link1--\n'] + line_list_dimer_ip1+ ['\n\n--Link1--\n'] + line_list_dimer_ip2 + ['\n\n--Link1--\n'] + line_list_dimer_it1 + ['\n\n--Link1--\n'] + line_list_dimer_it2 + ['\n\n--Link1--\n'] + line_list_dimer_it3 + ['\n\n--Link1--\n'] + line_list_dimer_it4 + ['\n\n--Link1--\n'] + line_list_dimer_i02 + ['\n\n--Link1--\n'] + line_list_dimer_ip3+ ['\n\n--Link1--\n'] + line_list_dimer_ip4  + ['\n\n\n']##2層目9分子
     
     file_name = get_file_name_from_dict(monomer_name,params_dict)
