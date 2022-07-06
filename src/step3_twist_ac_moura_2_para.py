@@ -194,10 +194,6 @@ def filter_df(df, dict_filter):
         else:
             query.append('{} == {}'.format(k,v))
             df=df[df[k]==v]
-    df['A1']=df['A1'].astype(float)##df.queryのバグ
-    df['A2']=df['A2'].astype(float)##df.queryのバグ
-    df['cy']=df['cy'].astype(float)##df.queryのバグ
-    query0=' and '.join(query)
     df_filtered=df
     return df_filtered
 
